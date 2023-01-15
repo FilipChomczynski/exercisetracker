@@ -4,9 +4,12 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 require('dotenv').config();
 
-mongoose.connect(process.env.MONGO_URI, function () {
-	console.log('[DB] Connected');
-});
+mongoose.connect(
+	'mongodb+srv://filip:aWRMOEPWO1NHvq0y@cluster0.bo1aqqp.mongodb.net/?retryWrites=true&w=majority',
+	function () {
+		console.log('[DB] Connected');
+	}
+);
 
 const userSchema = new mongoose.Schema({
 	username: String,
@@ -50,7 +53,7 @@ app.post('/api/users/:_id/exercises', async function (req, res) {
 		body.date = new Date();
 	}
 
-	await Exercise.create({
+	const exercise = await Exercise.create({
 		username: user.username,
 		description: body.description,
 		duration: body.duration,
@@ -58,9 +61,13 @@ app.post('/api/users/:_id/exercises', async function (req, res) {
 		userId: user.id,
 	});
 
-	const exercises = await Exercise.find({ username: user.username });
-
-	res.json({ user: user.toJSON(), exercises: exercises });
+	res.json({
+		username: user.username,
+		description: body.description,
+		duration: parseInt(body.duration),
+		date: new Date(body.date).toDateString(),
+		_id: user.id,
+	});
 });
 
 app.get('/api/users/:_id/logs', async function (req, res) {
